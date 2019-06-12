@@ -12,3 +12,7 @@ titles = ['', '', '', '', '', '', '', '', '']
 
 # Page Size
 page_size = 20
+
+# Date
+filtering = ""
+date = "2018-10-07

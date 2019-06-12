@@ -10,11 +10,15 @@ import conf
 column_titles = conf.titles
 PAGE_SIZE = conf.page_size
 
-def get_data(limit, sort):
+def get_data(limit, sort, field, filtering):
     try:
        headers = {'Accept':'application/json', 'Authorization': 'Bearer ' + conf.gw_token }
-       url = conf.url + "/" + conf.projnum + "/data" + \
-             "?limit=" + limit + "&sort=" + sort
+       if field == "":
+          url = conf.url + "/" + conf.projnum + "/data" + \
+                "?limit=" + limit + "&sort=" + sort
+       else:
+          url = conf.url + "/" + conf.projnum + "/data" + \
+                "?limit=" + limit + "&sort=" + sort + "&filter=" + field + ":" + filtering
        get_resp = requests.get(url, headers=headers, verify=False)
        if get_resp.status_code == 200:
           return get_resp
@@ -23,7 +27,12 @@ def get_data(limit, sort):
     except requests.exceptions.ConnectionError:
        return
 
-res = get_data("12000", "qty desc")
+basedate = conf.date
+formatfrom="%Y-%m-%d"
+formatto = "%a %b %d %H:%M:%S GMT %Y"
+date = datetime.strptime(basedate, formatfrom).strftime(formatto)
+
+res = get_data("12000", "Qty desc", conf.filtering, date)
 if res != None:
    docs = res.json()['docs']
    df = pd.read_json(json.dumps(docs), orient='columns')
